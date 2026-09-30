@@ -38,9 +38,17 @@ Os fluxos E2E cobrem inicialização, giro, histórico, regras, preferências, r
 - [ ] Desktop em 1536×776 mantém o gabinete jogável acima da dobra.
 - [ ] Desktop (>1024 px) exibe navegação completa e botão de fullscreen.
 - [ ] Tablet/mobile (≤1024 px) escondem links desktop e fullscreen e oferecem as opções pelo hamburger.
+- [ ] Em tablet/mobile, a top bar permanece fixa no topo durante o scroll e o conteúdo começa abaixo dela, sem sobreposição.
 - [ ] O botão de volume permanece acessível em todas as resoluções.
 - [ ] Mobile em ~390 px não cria overflow horizontal inesperado depois do loading.
 - [ ] A narrativa mobile/tablet aparece como toast temporário na parte inferior do hero sem cobrir o rosto da raposa.
+
+### Modais
+
+- [ ] Ao abrir qualquer modal, o scroll vertical e horizontal da página por trás fica bloqueado.
+- [ ] Se o modal tiver conteúdo maior que a altura disponível, somente o próprio modal rola.
+- [ ] Fechar pelo botão, `Esc` ou backdrop restaura a posição de scroll anterior da página.
+- [ ] O foco retorna ao elemento que abriu o modal.
 
 ### Rodada e rolos
 

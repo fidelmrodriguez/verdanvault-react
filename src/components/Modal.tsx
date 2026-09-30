@@ -15,8 +15,41 @@ export function Modal({
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     const dialog = ref.current;
+    const root = document.documentElement;
+    const body = document.body;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const previousBodyStyles = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+    };
+    const previousRootScrollBehavior = root.style.scrollBehavior;
+
+    root.classList.add('modal-scroll-lock');
+    body.classList.add('modal-scroll-lock');
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollY}px`;
+    body.style.left = `-${scrollX}px`;
+    body.style.right = '0';
+    body.style.width = '100%';
     dialog?.showModal();
-    return () => previous?.focus();
+
+    return () => {
+      root.classList.remove('modal-scroll-lock');
+      body.classList.remove('modal-scroll-lock');
+      body.style.position = previousBodyStyles.position;
+      body.style.top = previousBodyStyles.top;
+      body.style.left = previousBodyStyles.left;
+      body.style.right = previousBodyStyles.right;
+      body.style.width = previousBodyStyles.width;
+      root.style.scrollBehavior = 'auto';
+      window.scrollTo(scrollX, scrollY);
+      root.style.scrollBehavior = previousRootScrollBehavior;
+      previous?.focus();
+    };
   }, []);
 
   const closeFromBackdrop = (event: React.MouseEvent<HTMLDialogElement>) => {

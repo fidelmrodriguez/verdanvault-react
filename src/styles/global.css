@@ -13,6 +13,7 @@
   --mint: #b8f6c3;
   --gold: #ddc080;
   --cream: #f5e7bd;
+  --topbar-h: 56px;
   --cabinet-h: min(700px, calc(100svh - 66px));
 }
 
@@ -35,6 +36,14 @@ body.loading-scroll-lock {
   overflow: hidden !important;
   overscroll-behavior: none;
   touch-action: none;
+}
+
+/* Keep the page behind a native dialog completely stationary. The dialog itself
+   remains independently scrollable through its own overflow:auto. */
+html.modal-scroll-lock,
+body.modal-scroll-lock {
+  overflow: hidden !important;
+  overscroll-behavior: none;
 }
 button,
 a,
@@ -1763,7 +1772,10 @@ td { color: #a9b6ad; }
 }
 
 @media (max-height: 700px) and (min-width: 701px) {
-  :root { --cabinet-h: calc(100svh - 58px); }
+  :root {
+    --topbar-h: 50px;
+    --cabinet-h: calc(100svh - 58px);
+  }
   .topbar { height: 50px; min-height: 50px; }
   main { padding-top: 4px; }
   .game-stage { min-height: 590px; grid-template-rows: 38px 188px minmax(0,1fr); }
@@ -1783,6 +1795,25 @@ td { color: #a9b6ad; }
 }
 
 @media (max-width: 1024px) {
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: var(--topbar-h);
+    min-height: var(--topbar-h);
+    z-index: 120;
+  }
+
+  main {
+    padding-top: calc(var(--topbar-h) + 8px);
+  }
+
+  .game-layout {
+    scroll-margin-top: calc(var(--topbar-h) + 10px);
+  }
+
   .desktop-nav,
   .header-status,
   .desktop-fullscreen-btn {

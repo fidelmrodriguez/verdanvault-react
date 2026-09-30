@@ -139,6 +139,18 @@ A classe só é removida depois que a transição de saída do loading termina. 
 
 - **Desktop (> 1024 px):** navegação completa no topo, status da expedição e botão de fullscreen.
 - **Tablet/mobile (≤ 1024 px):** links do topo e fullscreen desaparecem; as opções ficam acessíveis pelo menu hamburger. O botão de volume permanece disponível.
+- Em tablet/mobile, `.topbar` usa `position: fixed` com compensação equivalente em `main`, evitando que o conteúdo fique escondido sob a barra.
+- O `scroll-margin-top` da área de jogo também considera a altura da top bar fixa para que âncoras continuem alinhadas corretamente.
+
+## Modais e scroll lock
+
+`Modal.tsx` usa o `<dialog>` nativo em top layer e preserva a posição atual da página ao abrir:
+
+- `html` e `body` recebem `modal-scroll-lock`;
+- o `body` é temporariamente fixado na posição atual, impedindo scroll vertical e horizontal por trás do modal;
+- `dialog` mantém `overflow: auto`, então conteúdo extenso continua rolável dentro do próprio modal;
+- ao fechar, classes e estilos temporários são removidos e o scroll é restaurado exatamente para a posição anterior;
+- o foco retorna ao elemento que abriu o modal.
 
 ## Ciclo de vida e performance
 

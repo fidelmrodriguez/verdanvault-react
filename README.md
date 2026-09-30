@@ -26,6 +26,8 @@ https://verdanvault-react.netlify.app/
 - Modo standalone automático para hospedagem estática; o jogo continua funcional sem backend.
 - Layout responsivo com gabinete completo acima da dobra em 1536×776, comportamento dedicado em tela cheia e a mesma coreografia de rolos em desktop, tablet e mobile.
 - Loading responsivo com enquadramento dedicado em telas menores e scroll vertical/horizontal bloqueado até a transição terminar.
+- Modais travam completamente o scroll da página por trás e mantêm apenas o conteúdo interno do próprio modal rolável.
+- Em tablet/mobile, a top bar permanece fixa no topo durante a navegação; no desktop ela mantém o comportamento normal da composição.
 - Testes de regras, API e fluxos de navegador.
 
 ## Stack

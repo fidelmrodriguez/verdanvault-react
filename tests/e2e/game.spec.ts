@@ -186,3 +186,48 @@ test('sequência de vitórias mantém o modal aberto e avança apenas quando o u
   });
   await expect(page.getByText(/VITÓRIAS GARANTIDAS · VARIAÇÃO 1\/10/)).toBeVisible();
 });
+
+
+test('modal bloqueia o documento e mantém apenas o conteúdo do dialog rolável', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Girar · explorar relíquias' })).toBeEnabled();
+
+  await page.getByRole('button', { name: 'Preferências', exact: true }).first().click();
+  await expect(page.getByRole('heading', { name: 'Preferências' })).toBeVisible();
+
+  const locked = await page.evaluate(() => ({
+    html: document.documentElement.classList.contains('modal-scroll-lock'),
+    body: document.body.classList.contains('modal-scroll-lock'),
+    position: getComputedStyle(document.body).position,
+    dialogOverflow: getComputedStyle(document.querySelector('dialog')!).overflowY,
+  }));
+  expect(locked.html).toBe(true);
+  expect(locked.body).toBe(true);
+  expect(locked.position).toBe('fixed');
+  expect(['auto', 'scroll']).toContain(locked.dialogOverflow);
+
+  await page.getByRole('button', { name: 'Fechar', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Preferências' })).toBeHidden();
+  expect(
+    await page.evaluate(() =>
+      document.documentElement.classList.contains('modal-scroll-lock') ||
+      document.body.classList.contains('modal-scroll-lock'),
+    ),
+  ).toBe(false);
+});
+
+test('tablet/mobile mantém a top bar fixa', async ({ page }) => {
+  await page.setViewportSize({ width: 768, height: 900 });
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Girar · explorar relíquias' })).toBeEnabled();
+
+  const before = await page.locator('.topbar').boundingBox();
+  const style = await page.locator('.topbar').evaluate((element) => getComputedStyle(element).position);
+  expect(style).toBe('fixed');
+  expect(before?.y ?? -1).toBeCloseTo(0, 0);
+
+  await page.evaluate(() => window.scrollTo(0, 450));
+  await page.waitForTimeout(80);
+  const after = await page.locator('.topbar').boundingBox();
+  expect(after?.y ?? -1).toBeCloseTo(0, 0);
+});
