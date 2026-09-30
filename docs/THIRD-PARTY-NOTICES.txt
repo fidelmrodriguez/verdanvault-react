@@ -1,3 +1,8 @@
+VERDANT VAULT — THIRD-PARTY NOTICES
+
+Este arquivo reúne avisos de licença de dependências de terceiros distribuídas com o bundle.
+Assets visuais e a trilha local do projeto são documentados separadamente em docs/ASSETS.md.
+
 Licenças de dependências incluídas no bundle.
 
 --- node_modules/@fontsource/dm-sans ---

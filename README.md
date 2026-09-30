@@ -10,13 +10,13 @@ https://verdanvault-react.netlify.app/
 
 - Slot 3×3 com cinco linhas e seis relíquias.
 - Composição vertical em três atos: cena animada, rolos e controles/informações — o mesmo ritmo visual de um jogo de slot completo.
-- Cena superior em camadas com parallax, câmera viva, personagem recortado em movimento independente, foco de cabeça/corpo, aura da relíquia, névoa, brilho de cachoeira, folhas e vaga-lumes.
+- Hero responsivo com cenário, raposa reativa e narrativa contextual; em tablet/mobile o texto vira uma notificação temporária na parte inferior para manter o personagem em destaque.
 - Animação dos rolos com aceleração, giro prolongado, parada sequencial, antecipação e bounce de assentamento; durante o giro, o botão principal vira `PARAR` para concluir a apresentação imediatamente sem recalcular o resultado.
-- Vitória com pulso dos símbolos premiados, linhas vivas, partículas PixiJS, chuva de moedas, flash do gabinete, reação do personagem, flare no cenário e placa de recompensa com contador animado.
+- Celebrações progressivas: vitória normal usa chuva de moedas; BIG WIN adiciona ondas de choque e faíscas; a grande descoberta intensifica o efeito com mais moedas, anéis luminosos, fragmentos dourados e flash global.
 - Trilha local **Humid Discovery** em loop, com introdução atmosférica, groove de andamento médio, percussão orgânica, camadas suaves de synth/pad e motivos melódicos de corda/pluck; efeitos do jogo continuam sintetizados com Web Audio.
 - Interface em React com controles por mouse, toque e teclado (`Espaço`).
-- Custos de rodada ajustáveis, modo turbo, 5 rodadas automáticas, música e efeitos controláveis separadamente, tela cheia e histórico das últimas 30 rodadas.
-- **Sequência de vitórias (opcional):** em Preferências, inicia um loop automático que apresenta todas as combinações vencedoras determinísticas em ordem — símbolos, diagonais, múltiplas linhas e grandes descobertas — e então volta à primeira. Desligada por padrão; ao desativar, o sorteio normal volta imediatamente.
+- Custos de rodada ajustáveis, modo turbo, 5 rodadas automáticas, música e efeitos controláveis separadamente, fullscreen no desktop e histórico das últimas 30 rodadas.
+- **Sequência de vitórias (opcional):** em Preferências, cada giro iniciado pelo usuário recebe a próxima combinação vencedora determinística — símbolos, diagonais, múltiplas linhas e grandes descobertas. Após a última variação, a sequência volta à primeira; ao desativar, os próximos giros retornam ao sorteio normal.
 
 - **Mascote reativa:** a raposa muda para busca durante o giro, reação sem recompensa quando a rodada não paga e estados progressivos para vitória normal, BIG WIN e grande descoberta.
 - **Celebrações por nível:** vitória normal usa chuva de moedas; BIG WIN adiciona ondas de choque e faíscas; a grande descoberta intensifica o espetáculo com mais moedas, anéis luminosos e fragmentos dourados.
@@ -25,6 +25,7 @@ https://verdanvault-react.netlify.app/
 - Servidor Node opcional com sessão em memória, idempotência, REST e WebSocket.
 - Modo standalone automático para hospedagem estática; o jogo continua funcional sem backend.
 - Layout responsivo com gabinete completo acima da dobra em 1536×776, comportamento dedicado em tela cheia e a mesma coreografia de rolos em desktop, tablet e mobile.
+- Loading responsivo com enquadramento dedicado em telas menores e scroll vertical/horizontal bloqueado até a transição terminar.
 - Testes de regras, API e fluxos de navegador.
 
 ## Stack
