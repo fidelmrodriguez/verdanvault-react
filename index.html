@@ -1,14 +1,18 @@
-import '@fontsource/dm-sans/latin-400.css';
-import '@fontsource/dm-sans/latin-500.css';
-import '@fontsource/dm-sans/latin-700.css';
-import '@fontsource/manrope/latin-500.css';
-import '@fontsource/manrope/latin-600.css';
-import { createRoot } from 'react-dom/client';
-import { AppErrorBoundary } from './components/AppErrorBoundary';
-import App from './App';
-import './styles/global.css';
-createRoot(document.getElementById('root')!).render(
-  <AppErrorBoundary>
-    <App />
-  </AppErrorBoundary>,
-);
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#09231e" />
+    <meta
+      name="description"
+      content="Verdant Vault — The Lost Temple. Um jogo web 2D de exploração e relíquias construído com React, TypeScript e PixiJS."
+    />
+    <link rel="icon" href="/favicon.svg" />
+    <title>Verdant Vault · The Lost Temple</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

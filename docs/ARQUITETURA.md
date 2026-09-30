@@ -2,30 +2,54 @@
 
 ## Visão geral
 
-Verdant Vault separa interface, domínio, renderização e transporte para que a lógica de jogo não dependa do React nem do PixiJS.
+Verdant Vault separa interface, domínio, renderização e transporte. O `App.tsx` atua como orquestrador dos estados e efeitos de alto nível; a apresentação é dividida em componentes React menores, enquanto regras e animação dos rolos permanecem independentes do React.
 
 ```txt
-UI React
-  ↓
+React UI
+  ├─ GameHeader / LoadingScreen
+  ├─ GameStage
+  │   ├─ HeroScene
+  │   ├─ GameCanvas (PixiJS)
+  │   └─ WinCelebration
+  ├─ GameSidebar
+  └─ GameModals
+        ↓
 useGame / Zustand
-  ↓
+        ↓
 gameService
   ├─ servidor Node: REST + WebSocket
   └─ standalone: Web Crypto + localStorage
-  ↓
+        ↓
 SlotEngine (PixiJS)
 ```
+
+O conteúdo narrativo e o catálogo de assets do hero ficam em `src/content/hero.ts`, evitando que textos e caminhos de mídia fiquem acoplados ao componente raiz.
 
 ## Fluxo da rodada
 
 1. A UI valida se o jogo está pronto e se há créditos suficientes.
-2. `useGame` cria uma chave de idempotência e inicia a animação.
-3. `gameService` solicita a rodada ao servidor ou calcula no modo standalone.
-4. A grade final fica conhecida antes de qualquer rolo parar.
-5. `SlotEngine.finish()` agenda as três paradas, com tempos diferentes por modo.
-6. Depois do assentamento, o store recebe saldo, resultado e histórico.
+2. `useGame` cria uma chave de idempotência e solicita a rodada.
+3. `gameService` usa o servidor Node ou o modo standalone.
+4. A grade final é conhecida antes de qualquer rolo parar.
+5. `SlotEngine.finish()` executa a timeline visual determinística.
+6. Cada rolo revela o resultado de baixo para cima: linha inferior, central e superior.
+7. Depois do assentamento, Zustand recebe saldo, resultado e histórico.
 
 A movimentação transitória dos símbolos não influencia o resultado.
+
+## Componentização React
+
+- `App.tsx`: orquestra ciclo de vida, loading, narrativa, áudio e ações globais.
+- `GameHeader.tsx`: navegação desktop e menu responsivo.
+- `LoadingScreen.tsx`: loading e progresso de preload.
+- `GameStage.tsx`: gabinete, rolos, controles e estados visuais principais.
+- `HeroScene.tsx`: cenário, raposas e narrativa contextual.
+- `WinCelebration.tsx`: efeitos progressivos de vitória normal, BIG WIN e grande descoberta.
+- `GameSidebar.tsx`: diário, histórico recente e atalhos de ritmo.
+- `GameModals.tsx`: regras, histórico, preferências e diagnóstico.
+- `GameCanvas.tsx`: integração React ↔ PixiJS.
+
+Componentes de apresentação podem ler o estado global via Zustand quando isso evita prop drilling excessivo; ações de navegação e fluxo permanecem explícitas por props.
 
 ## Servidor
 
@@ -43,46 +67,49 @@ O servidor Node usa uma sessão em memória por cookie `HttpOnly` e mantém até
 
 ## Modo standalone
 
-Se a build de produção estiver em uma hospedagem estática e `/api/session` não existir, o serviço troca automaticamente para o modo standalone. A interface não precisa saber qual transporte está ativo.
-
-Nesse modo:
+Se `/api/session` não estiver disponível em uma hospedagem estática, o serviço troca automaticamente para o modo standalone. Nesse modo:
 
 - a grade usa `crypto.getRandomValues` com rejeição para evitar viés de módulo;
 - saldo e histórico são persistidos em `localStorage` quando disponível;
-- o mesmo contrato Zod de sessão e rodada continua sendo usado;
-- o motor PixiJS e os componentes React permanecem idênticos.
+- os mesmos contratos Zod de sessão e rodada continuam sendo usados;
+- PixiJS e os componentes React não precisam saber qual transporte está ativo.
 
-## Renderização
+## Renderização e ritmo
 
-O PixiJS mantém quatro sprites por coluna para permitir wrap contínuo. As texturas dos seis símbolos são geradas apenas na inicialização. Durante o giro, apenas posição, alpha, escala e referência de textura são alterados.
+O PixiJS mantém quatro sprites por coluna para permitir wrap contínuo. Texturas dos seis símbolos são geradas na inicialização; durante o giro, o motor altera posição, alpha, escala e referência de textura.
 
-A apresentação é dividida em três zonas: cena cinematográfica no topo, rolos no centro e controles/estado na base. A cena superior é composta por camadas CSS do mesmo asset (ambiente, recorte do personagem e foco de cabeça/corpo), somadas a aura da relíquia, névoa, brilho de cachoeira, folhas e partículas. Isso permite respostas visuais independentes aos estados `idle`, `spinning` e `win` sem carregar vídeo pesado.
+O giro normal usa uma timeline única de aproximadamente **6 segundos** em desktop, tablet e mobile:
 
-A parada normal usa:
+- cerca de 4 s de viagem antes da primeira parada;
+- intervalo de 500 ms entre os rolos;
+- antecipação adicional no terceiro rolo;
+- revelação sequencial inferior → central → superior;
+- bounce, squash, partículas e cue sonoro por aterrissagem;
+- celebração progressiva conforme o nível do prêmio.
 
-- cerca de 3 s de giro antes do primeiro rolo comprometer o resultado;
-- intervalo de 620 ms entre paradas;
-- atraso adicional de antecipação no terceiro rolo quando há retorno;
-- bounce amortecido no assentamento;
-- burst curto de partículas em cada parada de rolo;
-- desaceleração/pulso de antecipação no último rolo vencedor;
-- pulso contínuo apenas nos símbolos vencedores;
-- partículas PixiJS sobre os rolos e uma celebração CSS temporária sobre o gabinete e a cena.
+O Turbo ignora a animação dos rolos e apresenta o grid final imediatamente. O botão `PARAR` usa `SlotEngine.skip()` para encerrar apenas a apresentação visual; a grade já foi determinada e não é sorteada novamente.
 
-## Ciclo de vida
+## Hero e estados da raposa
 
-- O ticker é suspenso em aba oculta.
-- `destroy()` remove listeners, resolve promises pendentes e libera texturas/renderizador.
-- A timeline principal do giro é determinística e idêntica entre desktop, tablet e mobile; preferências do sistema não alteram a duração nem removem a coreografia dos rolos.
+O hero usa background e personagens como assets independentes. A raposa possui estados específicos para idle, busca durante o giro, ausência de recompensa, vitória normal, BIG WIN e grande descoberta. A narrativa contextual é selecionada por estado e rodada sem expor detalhes técnicos ao jogador.
+
+Em tablet/mobile, o texto narrativo vira uma notificação temporária na parte inferior do hero para preservar o personagem em destaque.
 
 ## Áudio
 
-`game/audio.ts` usa Web Audio API e mantém buses separados para trilha e efeitos. A trilha é procedural e só começa depois de uma interação válida do usuário, respeitando a política de autoplay dos navegadores. Efeitos de UI, giro, parada individual de rolo e níveis de vitória são sintetizados em tempo real; nenhum MP3 externo é necessário.
+`game/audio.ts` usa Web Audio API para os efeitos e mantém buses separados para música e FX. A trilha principal é o arquivo local **Humid Discovery**, reproduzido em loop após a primeira interação válida do usuário. O mix mantém efeitos de giro, parada e vitória acima da música, com controles independentes para trilha e efeitos.
+
+## Ciclo de vida
+
+- O ticker PixiJS é suspenso em aba oculta.
+- `destroy()` remove listeners, resolve promises pendentes e libera texturas/renderizador.
+- O preload cobre background, loading e todos os estados da raposa.
+- A timeline dos rolos é a mesma em desktop, tablet e mobile.
 
 ## Layout e viewport
 
-O gabinete principal possui orçamento de altura baseado em `100svh`. O alvo desktop de referência é 1536×776: header compacto + gabinete inteiro na primeira tela. Em resoluções mais baixas há um breakpoint por altura, além dos breakpoints por largura. O modo fullscreen usa uma grid própria e `overflow: hidden` para se comportar como cliente de jogo.
+O gabinete usa orçamento de altura baseado no viewport e breakpoints por largura/altura. Desktop preserva navegação completa e fullscreen; tablet/mobile usam menu hamburger e mantêm o hero centralizado. O loading possui enquadramento específico para telas menores sem recomprimir os assets.
 
 ## Controles de produto
 
-Além do giro manual, a UI expõe custo por rodada, turbo, cinco rodadas automáticas canceláveis, trilha/efeitos, fullscreen, histórico e regras. Enquanto a rodada está visualmente girando, o controle principal muda para `PARAR`: `SlotEngine.skip()` apenas encerra a animação e apresenta a grade já recebida, sem sortear novamente nem alterar o contrato. A automação continua reutilizando o mesmo `spin()` e o mesmo contrato de rodada; não existe um segundo caminho de negócio só para a UI.
+A UI oferece custo por rodada, Turbo, cinco rodadas automáticas canceláveis, música/FX independentes, fullscreen no desktop, histórico, regras e sequência opcional de vitórias determinísticas. Todas as variantes reutilizam o mesmo fluxo de rodada e o mesmo contrato de domínio.
