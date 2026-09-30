@@ -43,7 +43,6 @@ export class SlotEngine {
   private frameTime = 0;
   private frames = 0;
   private elapsed = 0;
-  private reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   private winningCells = new Set<string>();
   private winClock = 0;
 
@@ -190,22 +189,15 @@ export class SlotEngine {
       this.setGrid(round.grid);
       this.showWins(round);
       return Promise.resolve();
-    } else if (this.reduced) {
-      this.stopAt = Math.max(this.clock + 80, 430);
-      this.stopGap = 90;
-      this.rowRevealGap = 45;
-      this.settleTail = 120;
-      this.finalAnticipation = 0;
-    } else {
-      // Premium long-spin pacing: roughly twenty seconds from launch to the
-      // completed result. Most of that time is real reel travel, followed by a
-      // deliberate stop cascade and bottom -> middle -> top symbol landing.
-      this.stopAt = Math.max(this.clock + 1000, 25200);
-      this.stopGap = 1400;
-      this.rowRevealGap = 260;
-      this.settleTail = 850;
-      this.finalAnticipation = round.payout > 0 ? 650 : 450;
     }
+
+    // One canonical normal-spin timeline on every device and viewport.
+    // 5.40s travel + reel cascade + bottom -> middle -> top reveals = 8.00s total.
+    this.stopAt = 5400;
+    this.stopGap = 700;
+    this.rowRevealGap = 180;
+    this.settleTail = 490;
+    this.finalAnticipation = 350;
 
     return new Promise((resolve) => {
       this.done = resolve;
@@ -243,7 +235,7 @@ export class SlotEngine {
     if (!this.stopped[column]) {
       this.stopped[column] = true;
       audio.play('reel');
-      if (!this.reduced) this.stopBurst(column);
+      this.stopBurst(column);
 
       // Freeze the reel at cell centers, but keep the currently visible random
       // symbols until each result cell lands. This avoids the old "all rows pop
@@ -269,19 +261,14 @@ export class SlotEngine {
         sprite.texture = this.textures.get(this.result!.grid[column][row])!;
         sprite.alpha = 1;
         audio.play('reveal');
-        if (!this.reduced) this.symbolLandBurst(column, row);
+        this.symbolLandBurst(column, row);
       }
 
       const sprite = this.sprites[column][row];
       const sinceReveal = Math.max(0, sinceStop - revealAt);
-      const bounce =
-        this.reduced
-          ? 0
-          : Math.sin(sinceReveal / 48) * 8.5 * Math.exp(-sinceReveal / 150);
+      const bounce = Math.sin(sinceReveal / 48) * 8.5 * Math.exp(-sinceReveal / 150);
       const squash =
-        !this.reduced && sinceReveal < 180
-          ? Math.sin((sinceReveal / 180) * Math.PI) * 0.035
-          : 0;
+        sinceReveal < 180 ? Math.sin((sinceReveal / 180) * Math.PI) * 0.035 : 0;
 
       sprite.y = TOP + CELL * (row + 0.5) + bounce;
       sprite.alpha = 1;
@@ -300,20 +287,19 @@ export class SlotEngine {
   }
 
   private spinReel(column: number, dt: number) {
-    const acceleration = this.reduced ? 1 : Math.min(1, 0.22 + this.clock / 1800);
+    const acceleration = Math.min(1, 0.22 + this.clock / 1800);
     const anticipating =
-      !this.reduced &&
       !this.turbo &&
       column === 2 &&
       Boolean(this.result?.payout) &&
       this.stopping &&
       this.clock > this.stopAt + this.stopGap * 1.55;
     const anticipationPulse = anticipating ? 0.77 + Math.sin(this.clock / 82) * 0.08 : 1;
-    const speed = (this.reduced ? 0.42 : (0.9 + column * 0.09) * acceleration) * anticipationPulse;
+    const speed = (0.9 + column * 0.09) * acceleration * anticipationPulse;
 
     for (const sprite of this.sprites[column]) {
-      sprite.alpha = this.reduced ? 0.55 : anticipating ? 0.92 : 0.76;
-      const stretch = this.reduced ? 1 : anticipating ? 1.055 : 1.035;
+      sprite.alpha = anticipating ? 0.92 : 0.76;
+      const stretch = anticipating ? 1.055 : 1.035;
       sprite.scale.set(1, stretch);
       sprite.y += dt * speed;
       if (sprite.y > TOP + CELL * 3.5) {
@@ -379,7 +365,7 @@ export class SlotEngine {
       }
     }
 
-    if (!this.spinning && this.winningCells.size && !this.reduced) {
+    if (!this.spinning && this.winningCells.size) {
       this.winClock += dt;
       const pulse = 1 + Math.sin(this.winClock / 135) * 0.045;
       for (const key of this.winningCells) {
@@ -434,7 +420,7 @@ export class SlotEngine {
         .stroke({ color: 0xead096, width: 2, alpha: 0.5 });
     }
 
-    if (round.payout > 0 && !this.reduced) {
+    if (round.payout > 0) {
       for (const particle of this.particles) {
         particle.x = 300;
         particle.y = 195;

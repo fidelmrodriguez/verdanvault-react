@@ -73,7 +73,7 @@ A parada normal usa:
 
 - O ticker é suspenso em aba oculta.
 - `destroy()` remove listeners, resolve promises pendentes e libera texturas/renderizador.
-- `prefers-reduced-motion` encurta o giro e desativa animações decorativas via CSS.
+- A timeline principal do giro é determinística e idêntica entre desktop, tablet e mobile; preferências do sistema não alteram a duração nem removem a coreografia dos rolos.
 
 ## Áudio
 

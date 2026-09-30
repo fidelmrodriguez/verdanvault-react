@@ -30,13 +30,13 @@ Os fluxos E2E cobrem inicialização, giro, histórico, regras, preferências, r
 - Após a primeira interação, confirmar trilha procedural, sons de UI, giro, parada de cada rolo e vitória.
 - Alternar som e tela cheia.
 - Ocultar e restaurar a aba durante uma sessão.
-- Validar `prefers-reduced-motion`.
+- Validar que desktop, tablet e mobile executam a mesma timeline de rolos.
 - Publicar `dist/` em hospedagem estática e confirmar fallback standalone.
 - Executar `npm start` e confirmar REST + WebSocket.
 
 - [ ] Música e efeitos podem ser desligados e religados separadamente em Preferências.
 - [ ] Efeitos de giro/parada/vitória permanecem mais altos que a trilha, sem a música ficar inaudível.
 
-- [ ] Giro normal completa em aproximadamente 30 s; Turbo continua instantâneo.
+- [ ] Giro normal completa em aproximadamente 8 s em desktop, tablet e mobile; Turbo continua instantâneo.
 - [ ] Cada rolo revela o resultado em três etapas: linha inferior, linha central e linha superior.
 - [ ] Nenhuma parada normal substitui as três linhas finais simultaneamente.

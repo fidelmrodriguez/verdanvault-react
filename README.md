@@ -2,10 +2,6 @@
 
 Jogo web 2D de exploração construído com React, TypeScript e PixiJS. A experiência combina uma interface responsiva, rolos animados em WebGL, créditos virtuais, histórico de rodadas e uma camada opcional de servidor com REST e WebSocket.
 
-## Netlify
-
-https://verdanvault-react.netlify.app/
-
 ## Recursos
 
 - Slot 3×3 com cinco linhas e seis relíquias.
@@ -13,7 +9,7 @@ https://verdanvault-react.netlify.app/
 - Cena superior em camadas com parallax, câmera viva, personagem recortado em movimento independente, foco de cabeça/corpo, aura da relíquia, névoa, brilho de cachoeira, folhas e vaga-lumes.
 - Animação dos rolos com aceleração, giro prolongado, parada sequencial, antecipação e bounce de assentamento; durante o giro, o botão principal vira `PARAR` para concluir a apresentação imediatamente sem recalcular o resultado.
 - Vitória com pulso dos símbolos premiados, linhas vivas, partículas PixiJS, chuva de moedas, flash do gabinete, reação do personagem, flare no cenário e placa de recompensa com contador animado.
-- Trilha local **Humid Discovery** em loop, com introdução atmosférica, groove de andamento médio, percussão orgânica, camadas suaves de synth/pad e motivos melódicos de corda/pluck; efeitos do jogo continuam sintetizados com Web Audio e as transições respeitam `prefers-reduced-motion`.
+- Trilha local **Humid Discovery** em loop, com introdução atmosférica, groove de andamento médio, percussão orgânica, camadas suaves de synth/pad e motivos melódicos de corda/pluck; efeitos do jogo continuam sintetizados com Web Audio.
 - Interface em React com controles por mouse, toque e teclado (`Espaço`).
 - Custos de rodada ajustáveis, modo turbo, 5 rodadas automáticas, música e efeitos controláveis separadamente, tela cheia e histórico das últimas 30 rodadas.
 - **Sequência de vitórias (opcional):** em Preferências, inicia um loop automático que apresenta todas as combinações vencedoras determinísticas em ordem — símbolos, diagonais, múltiplas linhas e grandes descobertas — e então volta à primeira. Desligada por padrão; ao desativar, o sorteio normal volta imediatamente.
@@ -21,7 +17,7 @@ https://verdanvault-react.netlify.app/
 - Estado compartilhado com Zustand e validação de contratos com Zod.
 - Servidor Node opcional com sessão em memória, idempotência, REST e WebSocket.
 - Modo standalone automático para hospedagem estática; o jogo continua funcional sem backend.
-- Layout responsivo com gabinete completo acima da dobra em 1536×776, comportamento dedicado em tela cheia e suporte a `prefers-reduced-motion`.
+- Layout responsivo com gabinete completo acima da dobra em 1536×776, comportamento dedicado em tela cheia e a mesma coreografia de rolos em desktop, tablet e mobile.
 - Testes de regras, API e fluxos de navegador.
 
 ## Stack
@@ -117,7 +113,7 @@ React cuida da interface, histórico, preferências e diálogos. PixiJS mantém 
 
 ### Ritmo da rodada
 
-O giro normal agora dura aproximadamente 30 s e prioriza sensação de peso: os símbolos viajam em velocidade mais baixa, a fase sustentada é longa e os rolos param em cascata. Quando um rolo assenta, o resultado não aparece inteiro de uma vez: os símbolos aterrissam em ordem visual da última linha para a linha do meio e depois para a primeira, cada um com bounce, partículas e cue sonoro próprio. O Turbo continua apresentando o grid final imediatamente. O modo Turbo continua ignorando toda essa animação e apresenta o resultado imediatamente. Depois da parada, símbolos premiados pulsam e a cena superior entra em uma celebração curta com flare, contador de prêmio e partículas. No modo Turbo os rolos não percorrem animação: a rodada é resolvida e o grid final é apresentado imediatamente. `prefers-reduced-motion` encurta deslocamentos decorativos no modo normal.
+O giro normal usa uma única timeline de aproximadamente **8 segundos** em desktop, tablet e mobile. Os rolos mantêm a mesma sensação de peso em todas as telas: fase de viagem, parada em cascata e revelação de cada rolo da linha inferior para a central e depois para a superior, com bounce, partículas e cue sonoro por aterrissagem. O Turbo continua apresentando o grid final imediatamente, sem animação dos rolos. Depois da parada, símbolos premiados pulsam e a cena superior entra em celebração com flare, contador de prêmio e partículas.
 
 ### Áudio e sensação de jogo
 

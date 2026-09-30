@@ -1663,13 +1663,7 @@ td { color: #a9b6ad; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto !important;
-  }
+  html { scroll-behavior: auto; }
 }
 
 .sr-only {
