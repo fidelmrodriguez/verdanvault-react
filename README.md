@@ -2,6 +2,10 @@
 
 Jogo web 2D de exploração construído com React, TypeScript e PixiJS. A experiência combina uma interface responsiva, rolos animados em WebGL, créditos virtuais, histórico de rodadas e uma camada opcional de servidor com REST e WebSocket.
 
+## Netlify
+
+https://verdanvault-react.netlify.app/
+
 ## Recursos
 
 - Slot 3×3 com cinco linhas e seis relíquias.
@@ -113,7 +117,7 @@ React cuida da interface, histórico, preferências e diálogos. PixiJS mantém 
 
 ### Ritmo da rodada
 
-O giro normal usa uma única timeline de aproximadamente **8 segundos** em desktop, tablet e mobile. Os rolos mantêm a mesma sensação de peso em todas as telas: fase de viagem, parada em cascata e revelação de cada rolo da linha inferior para a central e depois para a superior, com bounce, partículas e cue sonoro por aterrissagem. O Turbo continua apresentando o grid final imediatamente, sem animação dos rolos. Depois da parada, símbolos premiados pulsam e a cena superior entra em celebração com flare, contador de prêmio e partículas.
+O giro normal usa uma única timeline de aproximadamente **6 segundos** em desktop, tablet e mobile. Os rolos mantêm a mesma sensação de peso em todas as telas: fase de viagem, parada em cascata e revelação de cada rolo da linha inferior para a central e depois para a superior, com bounce, partículas e cue sonoro por aterrissagem. O Turbo continua apresentando o grid final imediatamente, sem animação dos rolos. Depois da parada, símbolos premiados pulsam e a cena superior entra em celebração com flare, contador de prêmio e partículas.
 
 ### Áudio e sensação de jogo
 

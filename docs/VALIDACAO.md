@@ -37,6 +37,6 @@ Os fluxos E2E cobrem inicialização, giro, histórico, regras, preferências, r
 - [ ] Música e efeitos podem ser desligados e religados separadamente em Preferências.
 - [ ] Efeitos de giro/parada/vitória permanecem mais altos que a trilha, sem a música ficar inaudível.
 
-- [ ] Giro normal completa em aproximadamente 8 s em desktop, tablet e mobile; Turbo continua instantâneo.
+- [ ] Giro normal completa em aproximadamente 6 s em desktop, tablet e mobile; Turbo continua instantâneo.
 - [ ] Cada rolo revela o resultado em três etapas: linha inferior, linha central e linha superior.
 - [ ] Nenhuma parada normal substitui as três linhas finais simultaneamente.

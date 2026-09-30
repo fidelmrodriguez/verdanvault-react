@@ -506,7 +506,7 @@ main { padding: 8px 18px 34px; }
   bottom: -8px;
   width: clamp(205px, 22vw, 292px);
   height: calc(100% + 16px);
-  transform: translateX(-44%);
+  transform: translateX(-50%);
   z-index: 3;
   transform-origin: center bottom;
   pointer-events: none;
@@ -573,15 +573,17 @@ main { padding: 8px 18px 34px; }
 .hero-state-2 .hero-mascot-glow { background: radial-gradient(circle, rgba(125, 255, 216, .60) 0, rgba(125, 255, 216, .24) 44%, transparent 74%); }
 .hero-state-3 .hero-mascot-glow { background: radial-gradient(circle, rgba(255, 225, 105, .65) 0, rgba(255, 225, 105, .24) 44%, transparent 74%); }
 .hero-state-4 .hero-mascot-glow { background: radial-gradient(circle, rgba(255, 186, 95, .74) 0, rgba(255, 186, 95, .28) 46%, transparent 76%); }
-.mascot-1 { transform: translateX(-44%); }
-.mascot-2 { transform: translateX(-44%) scale(1.015); }
-.mascot-3 { transform: translateX(-44%) scale(1.03); }
-.mascot-4 { transform: translateX(-44%) scale(1.045); }
+.mascot-1,
+.mascot-2,
+.mascot-3,
+.mascot-4 {
+  transform: translateX(-50%);
+}
 .game-stage.is-busy .hero-background-image { filter: saturate(1.06) brightness(.95); }
-.game-stage.is-busy .hero-mascot-shell { animation: mascot-idle 2.4s ease-in-out infinite; }
+.game-stage.is-busy .hero-mascot { animation: mascot-idle 2.4s ease-in-out infinite; }
 .game-stage.is-busy .hero-mascot-glow { animation: relic-pulse 1.2s ease-in-out infinite; }
 .game-stage.is-celebrating .hero-background-image { filter: saturate(1.10) brightness(.98); animation: hero-win-camera 3.2s ease-out both; }
-.game-stage.is-celebrating .hero-mascot-shell { animation: mascot-celebrate .72s cubic-bezier(.17,.89,.28,1.25) 3 alternate; }
+.game-stage.is-celebrating .hero-mascot { animation: mascot-celebrate .72s cubic-bezier(.17,.89,.28,1.25) 3 alternate; }
 .game-stage.is-celebrating .hero-mascot-glow { opacity: 1; filter: blur(16px) brightness(1.25); animation: relic-pulse .55s ease-in-out infinite; }
 .hero-win-burst {
   inset: 0;
@@ -1512,13 +1514,6 @@ td { color: #a9b6ad; }
     left: 50%;
     width: clamp(210px, 31vw, 290px);
     height: calc(100% + 18px);
-    transform: translateX(-50%);
-  }
-
-  .mascot-1,
-  .mascot-2,
-  .mascot-3,
-  .mascot-4 {
     transform: translateX(-50%);
   }
 

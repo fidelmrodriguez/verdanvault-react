@@ -192,12 +192,12 @@ export class SlotEngine {
     }
 
     // One canonical normal-spin timeline on every device and viewport.
-    // 5.40s travel + reel cascade + bottom -> middle -> top reveals = 8.00s total.
-    this.stopAt = 5400;
-    this.stopGap = 700;
-    this.rowRevealGap = 180;
-    this.settleTail = 490;
-    this.finalAnticipation = 350;
+    // 4.00s travel + reel cascade + bottom -> middle -> top reveals = 6.00s total.
+    this.stopAt = 4000;
+    this.stopGap = 500;
+    this.rowRevealGap = 160;
+    this.settleTail = 430;
+    this.finalAnticipation = 250;
 
     return new Promise((resolve) => {
       this.done = resolve;
