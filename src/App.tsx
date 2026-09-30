@@ -7,8 +7,8 @@ import {
   Diamond,
   History,
   Leaf,
-  Maximize2,
   Menu,
+  Maximize2,
   Minus,
   Music2,
   Plus,
@@ -43,11 +43,13 @@ const HERO_MASCOTS = {
   2: '/game-art/fox-explorer-win.png',
   3: '/game-art/fox-explorer-big-win.png',
   4: '/game-art/fox-explorer-grand-win.png',
+  5: '/game-art/fox-searching.png',
+  6: '/game-art/fox-no-reward.png',
 } as const;
 const PRELOAD_ART = [LOADING_ART, HERO_BACKGROUND, ...Object.values(HERO_MASCOTS)] as const;
 
-type HeroMascotState = 1 | 2 | 3 | 4;
-type HeroStoryState = 'idle' | 'busy' | 'win' | 'big' | 'grand';
+type HeroMascotState = 1 | 2 | 3 | 4 | 5 | 6;
+type HeroStoryState = 'idle' | 'busy' | 'miss' | 'win' | 'big' | 'grand';
 type HeroStory = { kicker: string; headline: string; body: string };
 
 const HERO_STORIES: Record<HeroStoryState, readonly HeroStory[]> = {
@@ -133,6 +135,28 @@ const HERO_STORIES: Record<HeroStoryState, readonly HeroStory[]> = {
       kicker: 'PASSAGEM INSTÁVEL',
       headline: 'As ruínas estão reorganizando o caminho.',
       body: 'As colunas se movem, os símbolos descem e a expedição espera o momento exato em que tudo finalmente se encaixa.',
+    },
+  ],
+  miss: [
+    {
+      kicker: 'CAMINHO FECHADO',
+      headline: 'Desta vez, as ruínas permaneceram em silêncio.',
+      body: 'Nem toda passagem se abre de imediato. A raposa registra o caminho e se prepara para uma nova tentativa.',
+    },
+    {
+      kicker: 'NENHUMA RELÍQUIA',
+      headline: 'Os símbolos não revelaram um tesouro desta vez.',
+      body: 'O templo continua mudando. Um novo giro pode reorganizar as pistas e abrir outra rota pela expedição.',
+    },
+    {
+      kicker: 'PISTA PERDIDA',
+      headline: 'A trilha terminou antes da câmara secreta.',
+      body: 'A busca não acabou. Há outros sinais nas paredes e novas combinações esperando para surgir.',
+    },
+    {
+      kicker: 'SILÊNCIO NAS RUÍNAS',
+      headline: 'Nenhum prêmio apareceu nesta passagem.',
+      body: 'A expedição segue adiante. Às vezes, a próxima descoberta está escondida logo depois de um caminho vazio.',
     },
   ],
   win: [
@@ -269,6 +293,8 @@ export default function App() {
   const hasWinResult = s.phase === 'result' && (s.result?.payout ?? 0) > 0;
   const celebrating = hasWinResult && celebrationId === s.result?.id;
   const winMultiplier = (s.result?.payout ?? 0) / Math.max(s.result?.bet ?? 1, 1);
+  const celebrationTier =
+    winMultiplier >= 20 ? 'grand' : winMultiplier >= 8 ? 'big' : hasWinResult ? 'normal' : 'none';
   const winLabel =
     winMultiplier >= 20
       ? 'GRANDE DESCOBERTA'
@@ -284,9 +310,11 @@ export default function App() {
         ? 'big'
         : heroMascot === 2
           ? 'win'
-          : busy
-            ? 'busy'
-            : 'idle';
+          : heroMascot === 6
+            ? 'miss'
+            : heroMascot === 5 || busy
+              ? 'busy'
+              : 'idle';
   const heroStoryPool = HERO_STORIES[heroStoryState];
   const resultStorySeed = storySeed(s.result?.id, heroStoryPool.length);
   const heroStoryIndex =
@@ -319,26 +347,38 @@ export default function App() {
     }
 
     setCelebrationId(s.result.id);
-    const timer = window.setTimeout(() => setCelebrationId(null), 3600);
+    const duration = winMultiplier >= 20 ? 5600 : winMultiplier >= 8 ? 4600 : 3600;
+    const timer = window.setTimeout(() => setCelebrationId(null), duration);
     return () => window.clearTimeout(timer);
-  }, [s.phase, s.result?.id, s.result?.payout]);
+  }, [s.phase, s.result?.bet, s.result?.id, s.result?.payout, winMultiplier]);
 
   useEffect(() => {
-    if (s.phase !== 'result' || !(s.result?.payout ?? 0)) {
+    if (busy) {
+      setHeroMascot(5);
+      return;
+    }
+
+    if (s.phase !== 'result' || !s.result) {
       setHeroMascot(1);
       return;
+    }
+
+    if (!s.result.payout) {
+      setHeroMascot(6);
+      const restoreMiss = window.setTimeout(() => setHeroMascot(1), 3000);
+      return () => window.clearTimeout(restoreMiss);
     }
 
     const tier = heroWinTier;
     setHeroMascot(tier);
     const restore = window.setTimeout(
       () => setHeroMascot(1),
-      tier === 4 ? 4200 : tier === 3 ? 3600 : 3000,
+      tier === 4 ? 5600 : tier === 3 ? 4600 : 3400,
     );
     return () => {
       window.clearTimeout(restore);
     };
-  }, [heroWinTier, s.phase, s.result?.id, s.result?.payout]);
+  }, [busy, heroWinTier, s.phase, s.result?.id, s.result?.payout]);
 
   useEffect(() => {
     const payout = s.result?.payout ?? 0;
@@ -677,7 +717,7 @@ export default function App() {
       <main>
         <div className="game-layout" id="game">
           <section
-            className={`game-stage ${busy ? 'is-busy' : ''} ${celebrating ? 'is-celebrating' : ''} ${autoActive ? 'is-auto' : ''}`}
+            className={`game-stage ${busy ? 'is-busy' : ''} ${celebrating ? `is-celebrating celebration-${celebrationTier}` : ''} ${autoActive ? 'is-auto' : ''}`}
             ref={stage}
             aria-label="Jogo Verdant Vault"
           >
@@ -698,7 +738,11 @@ export default function App() {
                 >
                   {s.musicMuted && s.fxMuted ? <VolumeX size={17} /> : <Volume2 size={17} />}
                 </button>
-                <button className="glass-btn" aria-label="Alternar tela cheia" onClick={fullscreen}>
+                <button
+                  className="glass-btn desktop-fullscreen-btn"
+                  aria-label="Alternar tela cheia"
+                  onClick={fullscreen}
+                >
                   <Maximize2 size={17} />
                 </button>
               </div>
@@ -801,12 +845,32 @@ export default function App() {
               </div>
 
               {celebrating && (
-                <div className="win-celebration" aria-live="polite">
+                <div className={`win-celebration celebration-${celebrationTier}`} aria-live="polite">
                   <div className="coin-rain" aria-hidden="true">
-                    {Array.from({ length: 16 }, (_, index) => (
-                      <i key={index} className={`coin coin-${index + 1}`} />
+                    {Array.from({ length: celebrationTier === 'grand' ? 34 : celebrationTier === 'big' ? 24 : 16 }, (_, index) => (
+                      <i key={index} className={`coin coin-${(index % 16) + 1} coin-extra-${index + 1}`} />
                     ))}
                   </div>
+                  {(celebrationTier === 'big' || celebrationTier === 'grand') && (
+                    <div className="big-win-effects" aria-hidden="true">
+                      <i className="shockwave shockwave-1" />
+                      <i className="shockwave shockwave-2" />
+                      {Array.from({ length: celebrationTier === 'grand' ? 22 : 12 }, (_, index) => (
+                        <i key={index} className={`spark spark-${(index % 12) + 1}`} />
+                      ))}
+                    </div>
+                  )}
+                  {celebrationTier === 'grand' && (
+                    <div className="grand-win-effects" aria-hidden="true">
+                      <i className="grand-flash" />
+                      {Array.from({ length: 18 }, (_, index) => (
+                        <i key={index} className={`relic-shard shard-${(index % 9) + 1}`} />
+                      ))}
+                      <i className="grand-ring grand-ring-1" />
+                      <i className="grand-ring grand-ring-2" />
+                      <i className="grand-ring grand-ring-3" />
+                    </div>
+                  )}
                   <div className="win-plaque">
                     <span>{winLabel}</span>
                     <strong>+{credits(animatedWin)}</strong>

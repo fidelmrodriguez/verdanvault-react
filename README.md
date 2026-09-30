@@ -17,6 +17,9 @@ https://verdanvault-react.netlify.app/
 - Interface em React com controles por mouse, toque e teclado (`Espaço`).
 - Custos de rodada ajustáveis, modo turbo, 5 rodadas automáticas, música e efeitos controláveis separadamente, tela cheia e histórico das últimas 30 rodadas.
 - **Sequência de vitórias (opcional):** em Preferências, inicia um loop automático que apresenta todas as combinações vencedoras determinísticas em ordem — símbolos, diagonais, múltiplas linhas e grandes descobertas — e então volta à primeira. Desligada por padrão; ao desativar, o sorteio normal volta imediatamente.
+
+- **Mascote reativa:** a raposa muda para busca durante o giro, reação sem recompensa quando a rodada não paga e estados progressivos para vitória normal, BIG WIN e grande descoberta.
+- **Celebrações por nível:** vitória normal usa chuva de moedas; BIG WIN adiciona ondas de choque e faíscas; a grande descoberta intensifica o espetáculo com mais moedas, anéis luminosos e fragmentos dourados.
 - Renderização com PixiJS 8 e texturas geradas uma vez a partir de arte vetorial em código.
 - Estado compartilhado com Zustand e validação de contratos com Zod.
 - Servidor Node opcional com sessão em memória, idempotência, REST e WebSocket.
