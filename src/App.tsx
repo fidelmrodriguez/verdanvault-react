@@ -196,6 +196,23 @@ export default function App() {
   }, [loadingProgress]);
 
   useEffect(() => {
+    const root = document.documentElement;
+    const body = document.body;
+
+    if (!loadingComplete) {
+      root.classList.add('loading-scroll-lock');
+      body.classList.add('loading-scroll-lock');
+      return () => {
+        root.classList.remove('loading-scroll-lock');
+        body.classList.remove('loading-scroll-lock');
+      };
+    }
+
+    root.classList.remove('loading-scroll-lock');
+    body.classList.remove('loading-scroll-lock');
+  }, [loadingComplete]);
+
+  useEffect(() => {
     audio.setMusicEnabled(!s.musicMuted);
   }, [s.musicMuted]);
 
