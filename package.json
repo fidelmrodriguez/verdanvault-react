@@ -1,43 +1,43 @@
-{
-  "name": "verdant-vault",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "description": "Jogo web 2D com React, TypeScript, PixiJS, REST e WebSocket",
-  "scripts": {
-    "dev": "node --import tsx server/index.ts",
-    "build": "tsc --noEmit && vite build",
-    "start": "node --import tsx server/index.ts --production",
-    "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test tests/*.test.ts",
-    "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm test && npm run build",
-    "format": "prettier --write src server tests *.ts *.json *.html docs README.md",
-    "format:check": "prettier --check src server tests *.ts *.json *.html docs README.md"
-  },
-  "engines": {
-    "node": ">=22"
-  },
-  "dependencies": {
-    "@fontsource/dm-sans": "^5.3.0",
-    "@fontsource/manrope": "^5.3.0",
-    "lucide-react": "1.48.0",
-    "pixi.js": "8.21.0",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "ws": "8.22.0",
-    "zod": "4.6.5",
-    "zustand": "5.0.15"
-  },
-  "devDependencies": {
-    "@playwright/test": "1.63.0",
-    "@types/node": "26.6.3",
-    "@types/react": "19.3.0",
-    "@types/react-dom": "19.3.0",
-    "@types/ws": "8.18.2",
-    "prettier": "^3.5.3",
-    "tsx": "4.23.15",
-    "typescript": "^5.9.3",
-    "vite": "^6.4.2"
-  }
-}
+import { z } from 'zod';
+import { SYMBOLS, BETS } from '../game/rules';
+
+export const gridSchema = z.array(z.array(z.enum(SYMBOLS)).length(3)).length(3);
+
+export const roundSchema = z.object({
+  id: z.string(),
+  bet: z.number().int(),
+  payout: z.number().int(),
+  balance: z.number().int(),
+  grid: gridSchema,
+  wins: z.array(
+    z.object({
+      line: z.number().int().min(0).max(4),
+      symbol: z.enum(SYMBOLS),
+      amount: z.number().int(),
+    }),
+  ),
+  createdAt: z.string(),
+});
+
+export const sessionSchema = z.object({
+  balance: z.number().int(),
+  history: z.array(roundSchema),
+  virtual: z.literal(true),
+});
+
+export const spinRequestSchema = z.object({
+  requestId: z.string().uuid(),
+  bet: z
+    .number()
+    .int()
+    .refine((n) => BETS.includes(n)),
+  winSequence: z.boolean().optional().default(false),
+  winSequenceIndex: z.number().int().nonnegative().optional().default(0),
+});
+
+export const eventSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('connected'), at: z.string() }),
+  z.object({ type: z.literal('round.settled'), round: roundSchema }),
+  z.object({ type: z.literal('session.reset'), balance: z.number().int() }),
+  z.object({ type: z.literal('pong'), sentAt: z.number() }),
+]);

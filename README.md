@@ -44,7 +44,8 @@ https://verdanvault-react.netlify.app/
 
 ```txt
 src/
- ├── components/   interface, canvas e diálogos
+ ├── components/   header, loading, hero, gabinete, celebrações, sidebar, modais e canvas
+ ├── content/      narrativa e catálogo visual do hero
  ├── game/         regras, motor PixiJS, arte dos símbolos e áudio
  ├── hooks/        ciclo da rodada e conexão em tempo real
  ├── schemas/      contratos validados em runtime
